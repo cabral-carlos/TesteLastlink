@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using WebApplication1.Business;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -12,6 +10,13 @@ namespace WebApplication1.Controllers
     [ApiController]
     public class RequestsController : ControllerBase
     {
+        private readonly IRequestsBusiness _requestsBusiness;
+
+        public RequestsController(IRequestsBusiness requestsBusiness)
+        {
+            _requestsBusiness = requestsBusiness;
+        }
+
         // GET: api/<RequestsController>
         [HttpGet]
         public IEnumerable<string> Get()

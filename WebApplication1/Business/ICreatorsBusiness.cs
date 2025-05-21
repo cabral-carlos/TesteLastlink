@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using WebApplication1.Models;
 
 namespace WebApplication1.Business
 {
-    interface ICreatorsBusiness
+    public interface ICreatorsBusiness
     {
-
+        void AddCreator(Creator Creator);
+        IEnumerable<Creator> GetAll();
+        Creator GetCreatorByID(int id);
+        void DeleteCreator(int id);
     }
 }
