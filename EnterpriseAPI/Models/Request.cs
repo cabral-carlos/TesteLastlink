@@ -1,7 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
-namespace WebApplication1.Models
+namespace EnterpriseAPI.Models
 {
     public class Request
     {
@@ -29,17 +31,23 @@ namespace WebApplication1.Models
         public Creator Creator { get; set; }
     }
 
-
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum Status
     {
+        [EnumMember(Value = "Pending")]
         Pending,
+        [EnumMember(Value = "Approved")]
         Approved,
+        [EnumMember(Value = "Denied")]
         Denied
     }
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum Type
     {
+        [EnumMember(Value = "Regular")]
         Regular,
+        [EnumMember(Value = "Anticipation")]
         Anticipation
     }
 }

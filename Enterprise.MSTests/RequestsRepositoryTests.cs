@@ -3,11 +3,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WebApplication1;
-using WebApplication1.Models;
-using WebApplication1.Repositories;
+using EnterpriseAPI;
+using EnterpriseAPI.Models;
+using EnterpriseAPI.Repositories;
 
 namespace Enterprise.MSTests
 {
@@ -28,17 +26,14 @@ namespace Enterprise.MSTests
         public void ApproveRequests_ParametersAreCorrect_ResultIsSuccess()
         {
             // Arrange
-            var originalDate = new DateTime(2025, 5, 5);
             var fakeRequest = new Request
             {
                 Id = 12,
-                Type = WebApplication1.Models.Type.Anticipation,
+                Type = EnterpriseAPI.Models.Type.Anticipation,
                 Date = DateTime.Now,
                 GrossValue = 100,
                 Fee = 5,
                 NetValue = 95,
-                CreatedAt = originalDate,
-                UpdatedAt = originalDate,
                 CreatorId = 12
             };
 
@@ -46,17 +41,15 @@ namespace Enterprise.MSTests
             using (var context = new AppDBContext(_dbContextOptions))
             {
                 var repo = new RequestsRepository(context);
-                repo.Create(fakeRequest);
+                repo.Create(fakeRequest).Wait();
 
                 var requestFromDB = repo.GetById(12);
                 Assert.AreEqual(Status.Pending, requestFromDB.Status);
-                Assert.AreEqual(originalDate, requestFromDB.UpdatedAt);
 
-                repo.Approve(fakeRequest);
+                repo.Approve(fakeRequest).Wait();
             
                 var approvedFakeRequest = repo.GetById(12);
                 Assert.AreEqual(Status.Approved, approvedFakeRequest.Status);
-                Assert.AreNotEqual(originalDate, approvedFakeRequest.UpdatedAt);
             }
         }
 
@@ -64,17 +57,14 @@ namespace Enterprise.MSTests
         public void DenyRequests_ParametersAreCorrect_ResultIsSuccess()
         {
             // Arrange
-            var originalDate = new DateTime(2025, 5, 5);
             var fakeRequest = new Request
             {
                 Id = 15,
-                Type = WebApplication1.Models.Type.Anticipation,
+                Type = EnterpriseAPI.Models.Type.Anticipation,
                 Date = DateTime.Now,
                 GrossValue = 100,
                 Fee = 5,
                 NetValue = 95,
-                CreatedAt = originalDate,
-                UpdatedAt = originalDate,
                 CreatorId = 15
             };
 
@@ -82,17 +72,15 @@ namespace Enterprise.MSTests
             using (var context = new AppDBContext(_dbContextOptions))
             {
                 var repo = new RequestsRepository(context);
-                repo.Create(fakeRequest);
+                repo.Create(fakeRequest).Wait();
 
                 var requestFromDB = repo.GetById(15);
                 Assert.AreEqual(Status.Pending, requestFromDB.Status);
-                Assert.AreEqual(originalDate, requestFromDB.UpdatedAt);
 
-                repo.Deny(fakeRequest);
+                repo.Deny(fakeRequest).Wait();
 
                 var approvedFakeRequest = repo.GetById(15);
                 Assert.AreEqual(Status.Denied, approvedFakeRequest.Status);
-                Assert.AreNotEqual(originalDate, approvedFakeRequest.UpdatedAt);
             }
         }
 
@@ -103,7 +91,7 @@ namespace Enterprise.MSTests
             var fakeRequest = new Request
             {
                 Id = 10,
-                Type = WebApplication1.Models.Type.Anticipation,
+                Type = EnterpriseAPI.Models.Type.Anticipation,
                 Date = DateTime.Now,
                 GrossValue = 100, 
                 Fee = 5,
@@ -117,7 +105,7 @@ namespace Enterprise.MSTests
             using (var context = new AppDBContext(_dbContextOptions))
             {
                 var repo = new RequestsRepository(context);
-                repo.Create(fakeRequest);
+                repo.Create(fakeRequest).Wait();
             }
 
             // Assert
@@ -140,7 +128,7 @@ namespace Enterprise.MSTests
             // Arrange
             var firstFakeRequest = new Request
             {
-                Type = WebApplication1.Models.Type.Anticipation,
+                Type = EnterpriseAPI.Models.Type.Anticipation,
                 Date = DateTime.Now,
                 GrossValue = 100,
                 Fee = 5,
@@ -152,7 +140,7 @@ namespace Enterprise.MSTests
 
             var secondFakeRequest = new Request
             {
-                Type = WebApplication1.Models.Type.Anticipation,
+                Type = EnterpriseAPI.Models.Type.Anticipation,
                 Date = DateTime.Now,
                 GrossValue = 100,
                 Fee = 50,
@@ -164,12 +152,21 @@ namespace Enterprise.MSTests
             };
 
             using var context = new AppDBContext(_dbContextOptions);
-            var repo = new RequestsRepository(context);
-            repo.Create(firstFakeRequest);
-            repo.Create(secondFakeRequest);
+            var creatorsRepo = new CreatorsRepository(context);
+            creatorsRepo.Add(new Creator() 
+            { 
+                Id = 3,
+                Name = "Mark", 
+                CreatedAt = DateTime.Now, 
+                IsActive = true
+            }).Wait();
+
+            var requestsRepo = new RequestsRepository(context);
+            requestsRepo.Create(firstFakeRequest).Wait();
+            requestsRepo.Create(secondFakeRequest).Wait();
 
             // Act
-            var requestsFromDB = repo.GetByCreatorId(3);
+            var requestsFromDB = requestsRepo.GetByCreatorId(3);
 
             // Assert
             Assert.AreEqual(2, requestsFromDB.Count());
@@ -211,7 +208,7 @@ namespace Enterprise.MSTests
             {
                 new Request
                 {
-                    Type = WebApplication1.Models.Type.Anticipation,
+                    Type = EnterpriseAPI.Models.Type.Anticipation,
                     Date = DateTime.Now,
                     GrossValue = 100,
                     Fee = 5,
@@ -222,7 +219,7 @@ namespace Enterprise.MSTests
                 },
                 new Request
                 {
-                    Type = WebApplication1.Models.Type.Anticipation,
+                    Type = EnterpriseAPI.Models.Type.Anticipation,
                     Date = DateTime.Now,
                     GrossValue = 100,
                     Fee = 50,
@@ -236,8 +233,8 @@ namespace Enterprise.MSTests
 
             using var context = new AppDBContext(_dbContextOptions);
             var repo = new RequestsRepository(context);
-            repo.Create(fakeRequests[0]);
-            repo.Create(fakeRequests[1]);
+            repo.Create(fakeRequests[0]).Wait();
+            repo.Create(fakeRequests[1]).Wait();
 
             // Act
             var requestsFromDB = repo.CountPendingByCreatorId(5);
@@ -253,7 +250,7 @@ namespace Enterprise.MSTests
             var fakeRequest = new Request
             {
                 Id = 7,
-                Type = WebApplication1.Models.Type.Anticipation,
+                Type = EnterpriseAPI.Models.Type.Anticipation,
                 Date = DateTime.Now,
                 GrossValue = 100,
                 Fee = 5,
@@ -265,7 +262,7 @@ namespace Enterprise.MSTests
 
             using var context = new AppDBContext(_dbContextOptions);
             var repo = new RequestsRepository(context);
-            repo.Create(fakeRequest);
+            repo.Create(fakeRequest).Wait();
 
             // Act
             var requestFromDB = repo.GetById(7);

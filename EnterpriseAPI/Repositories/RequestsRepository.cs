@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using WebApplication1.Models;
+using System.Threading.Tasks;
+using EnterpriseAPI.Models;
 
-namespace WebApplication1.Repositories
+namespace EnterpriseAPI.Repositories
 {
     public class RequestsRepository : IRequestsRepository
     {
@@ -14,12 +16,12 @@ namespace WebApplication1.Repositories
             _context = context;
         }
 
-        public void Approve(Request request)
+        public async Task<bool> Approve(Request request)
         {
             request.Status = Status.Approved;
             request.UpdatedAt = DateTime.Now;
 
-            _context.SaveChanges();
+            return await _context.SaveChangesAsync() > 0;
         }
 
         public int CountPendingByCreatorId(int creatorId)
@@ -27,23 +29,26 @@ namespace WebApplication1.Repositories
             return GetByCreatorId(creatorId).Where(x => x.Status == Status.Pending).Count();
         }
 
-        public void Create(Request request)
+        public async Task<bool> Create(Request request)
         {
+            request.CreatedAt = DateTime.Now;
+            request.UpdatedAt = DateTime.Now;
             _context.Requests.Add(request);
-            _context.SaveChanges();
+
+            return await _context.SaveChangesAsync() > 0;
         }
 
-        public void Deny(Request request)
+        public async Task<bool> Deny(Request request)
         {
             request.Status = Status.Denied;
             request.UpdatedAt = DateTime.Now;
 
-            _context.SaveChanges();
+            return await _context.SaveChangesAsync() > 0;
         }
 
         public IEnumerable<Request> GetByCreatorId(int creatorId)
         {
-            return _context.Requests.Where(x => x.CreatorId == creatorId).ToList();
+            return _context.Requests.Where(x => x.CreatorId == creatorId).Include(x => x.Creator).ToList();
         }
 
         public Request GetById(int requestId)

@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
-using WebApplication1.Models;
+using System.Threading.Tasks;
+using EnterpriseAPI.Models;
 
-namespace WebApplication1.Repositories
+namespace EnterpriseAPI.Repositories
 {
     public interface IRequestsRepository
     {
-        void Create(Request request);
+        Task<bool> Create(Request request);
         IEnumerable<Request> GetByCreatorId(int creatorId);
         int CountPendingByCreatorId(int creatorId);
-        void Approve(Request request);
-        void Deny(Request request);
+        Task<bool> Approve(Request request);
+        Task<bool> Deny(Request request);
         Request GetById(int requestId);
     }
 }

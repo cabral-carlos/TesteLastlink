@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.33027.164
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{FA5BD67C-5DA7-4799-BDC1-2FEFC50887D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EnterpriseAPI", "EnterpriseAPI\EnterpriseAPI.csproj", "{FA5BD67C-5DA7-4799-BDC1-2FEFC50887D0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Enterprise.MSTests", "Enterprise.MSTests\Enterprise.MSTests.csproj", "{9DA3A2A8-FC63-44BA-B6F2-6F68B7892A17}"
 EndProject

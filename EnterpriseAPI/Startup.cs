@@ -1,14 +1,18 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
-using WebApplication1.Business;
-using WebApplication1.Repositories;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using EnterpriseAPI.Business;
+using EnterpriseAPI.Repositories;
+using EnterpriseAPI.Swagger;
 
-namespace WebApplication1
+namespace EnterpriseAPI
 {
     public class Startup
     {
@@ -26,25 +30,42 @@ namespace WebApplication1
             options.UseSqlite(Configuration.GetConnectionString("LocalConnection")));
 
             services.AddControllers();
+            services.AddApiVersioning(o => {
+                o.AssumeDefaultVersionWhenUnspecified = true;
+                o.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+            });
+            services.AddVersionedApiExplorer(s => {
+                s.GroupNameFormat = "'v'VVV";
+                s.SubstituteApiVersionInUrl = true;
+            });
+
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApplication1", Version = "v1" });
+                c.OperationFilter<SwaggerDefaultValues>();
             });
 
             services.AddScoped<ICreatorsBusiness, CreatorsBusiness>();
             services.AddScoped<IRequestsBusiness, RequestsBusiness>();
             services.AddScoped<ICreatorsRepository, CreatorsRepository>();
             services.AddScoped<IRequestsRepository, RequestsRepository>();
+            services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerGenOptions>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            var versionProvider = app.ApplicationServices.GetRequiredService<IApiVersionDescriptionProvider>();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApplication1 v1"));
+                app.UseSwaggerUI(c => { 
+                    foreach (var description in versionProvider.ApiVersionDescriptions)
+                    {
+                        c.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
+                            $"Web API - {description.GroupName.ToUpper()}");
+                    }
+                });
             }
 
             app.UseHttpsRedirection();

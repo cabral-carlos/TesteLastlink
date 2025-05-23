@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using WebApplication1.Models;
+using System.Threading.Tasks;
+using EnterpriseAPI.Models;
 
-namespace WebApplication1.Repositories
+namespace EnterpriseAPI.Repositories
 {
     public class CreatorsRepository : ICreatorsRepository
     {
@@ -13,16 +14,16 @@ namespace WebApplication1.Repositories
             _context = context;
         }
 
-        public void Add(Creator creator)
+        public async Task<bool> Add(Creator creator)
         {
             _context.Creators.Add(creator);
-            _context.SaveChanges();
+            return await _context.SaveChangesAsync() > 0;
         }
 
-        public void Delete(Creator creator)
+        public async Task<bool> Delete(Creator creator)
         {
             creator.IsActive = false;
-            _context.SaveChanges();
+            return await _context.SaveChangesAsync() > 0;
         }
 
         public IEnumerable<Creator> Get()

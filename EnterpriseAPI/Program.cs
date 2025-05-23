@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 
-namespace WebApplication1
+namespace EnterpriseAPI
 {
     public class Program
     {
@@ -14,7 +14,7 @@ namespace WebApplication1
 
             using (var scope = app.Services.CreateScope())
             {
-                var db = scope.ServiceProvider.GetRequiredService<AppDBContext>();
+                var db = scope.ServiceProvider.GetRequiredService<AppDBContext>();            
                 db.Database.Migrate();
             }
 

@@ -2,9 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
-using WebApplication1;
-using WebApplication1.Models;
-using WebApplication1.Repositories;
+using EnterpriseAPI;
+using EnterpriseAPI.Models;
+using EnterpriseAPI.Repositories;
 
 namespace Enterprise.MSTests
 {
@@ -38,7 +38,7 @@ namespace Enterprise.MSTests
             using (var context = new AppDBContext(_dbContextOptions))
             {
                 var repo = new CreatorsRepository(context);
-                repo.Add(fakeCreator);
+                repo.Add(fakeCreator).Wait();
             }
 
             // Assert
@@ -68,7 +68,7 @@ namespace Enterprise.MSTests
             var repo = new CreatorsRepository(context);
 
             // Act
-            repo.Delete(fakeCreator);
+            repo.Delete(fakeCreator).Wait();
 
             // Assert
             var creatorFromDB = repo.GetByID(1);
@@ -119,7 +119,7 @@ namespace Enterprise.MSTests
 
             using var context = new AppDBContext(_dbContextOptions);
             var repo = new CreatorsRepository(context);
-            repo.Add(fakeCreator);
+            repo.Add(fakeCreator).Wait();
 
             // Act
             var creatorFromDB = repo.GetByID(5);
