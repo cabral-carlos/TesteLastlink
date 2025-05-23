@@ -73,7 +73,7 @@ namespace EnterpriseAPI.Business
 
         private bool ValidateNewRequest(Request request)
         {
-            if (_creatorsRepository.GetByID(request.CreatorId) == null)
+            if (_creatorsRepository.GetById(request.CreatorId) == null)
             {
                 return false;
             }

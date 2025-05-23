@@ -71,7 +71,7 @@ namespace Enterprise.MSTests
             repo.Delete(fakeCreator).Wait();
 
             // Assert
-            var creatorFromDB = repo.GetByID(1);
+            var creatorFromDB = repo.GetById(1);
             Assert.IsNull(creatorFromDB);
         }
 
@@ -122,7 +122,7 @@ namespace Enterprise.MSTests
             repo.Add(fakeCreator).Wait();
 
             // Act
-            var creatorFromDB = repo.GetByID(5);
+            var creatorFromDB = repo.GetById(5);
 
             // Assert
             Assert.IsNotNull(creatorFromDB);
@@ -139,7 +139,7 @@ namespace Enterprise.MSTests
             var repo = new CreatorsRepository(context);
 
             // Act
-            var creatorFromDB = repo.GetByID(99);
+            var creatorFromDB = repo.GetById(99);
 
             // Assert
             Assert.IsNull(creatorFromDB);

@@ -8,7 +8,7 @@ namespace EnterpriseAPI.Repositories
     {
         Task<bool> Add(Creator Creator);
         IEnumerable<Creator> Get();
-        Creator GetByID(int id);
+        Creator GetById(int id);
         Task<bool> Delete(Creator creator);
     }
 }

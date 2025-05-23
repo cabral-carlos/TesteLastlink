@@ -29,7 +29,7 @@ namespace EnterpriseAPI.Business
 
         public async Task<bool> DeleteCreator(int id)
         {
-            var creator = GetCreatorByID(id);
+            var creator = GetCreatorById(id);
             if (creator == null)
             {
                 return false;
@@ -43,9 +43,9 @@ namespace EnterpriseAPI.Business
             return _creatorsRepository.Get();
         }
 
-        public Creator GetCreatorByID(int id)
+        public Creator GetCreatorById(int id)
         {
-            return _creatorsRepository.GetByID(id);
+            return _creatorsRepository.GetById(id);
         }
     }
 }

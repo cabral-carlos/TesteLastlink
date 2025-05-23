@@ -8,7 +8,7 @@ namespace EnterpriseAPI.Business
     {
         Task<bool> AddCreator(string name);
         IEnumerable<Creator> GetAll();
-        Creator GetCreatorByID(int id);
+        Creator GetCreatorById(int id);
         Task<bool> DeleteCreator(int id);
     }
 }

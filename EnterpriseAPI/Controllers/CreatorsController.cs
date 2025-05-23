@@ -41,7 +41,7 @@ namespace EnterpriseAPI.Controllers
                 return BadRequest(zeroIdParameterError);
             }
 
-            var creator = _creatorsBusiness.GetCreatorByID(id);
+            var creator = _creatorsBusiness.GetCreatorById(id);
 
             if (creator == null)
             {

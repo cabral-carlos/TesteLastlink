@@ -31,7 +31,7 @@ namespace EnterpriseAPI.Repositories
             return _context.Creators.ToList();
         }
 
-        public Creator GetByID(int id)
+        public Creator GetById(int id)
         {
             var creator = _context.Creators.Where(x => x.Id == id).FirstOrDefault();
             return creator;
