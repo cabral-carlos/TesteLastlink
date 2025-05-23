@@ -54,139 +54,6 @@ namespace Enterprise.MSTests
         }
 
         [TestMethod]
-        public void DenyRequests_ParametersAreCorrect_ResultIsSuccess()
-        {
-            // Arrange
-            var fakeRequest = new Request
-            {
-                Id = 15,
-                Type = EnterpriseAPI.Models.Type.Anticipation,
-                Date = DateTime.Now,
-                GrossValue = 100,
-                Fee = 5,
-                NetValue = 95,
-                CreatorId = 15
-            };
-
-            // Act and Assert
-            using (var context = new AppDBContext(_dbContextOptions))
-            {
-                var repo = new RequestsRepository(context);
-                repo.Create(fakeRequest).Wait();
-
-                var requestFromDB = repo.GetById(15);
-                Assert.AreEqual(Status.Pending, requestFromDB.Status);
-
-                repo.Deny(fakeRequest).Wait();
-
-                var approvedFakeRequest = repo.GetById(15);
-                Assert.AreEqual(Status.Denied, approvedFakeRequest.Status);
-            }
-        }
-
-        [TestMethod]
-        public void CreateRequests_ParametersAreCorrect_ResultIsSuccess()
-        {
-            // Arrange
-            var fakeRequest = new Request
-            {
-                Id = 10,
-                Type = EnterpriseAPI.Models.Type.Anticipation,
-                Date = DateTime.Now,
-                GrossValue = 100, 
-                Fee = 5,
-                NetValue = 95,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now,
-                CreatorId = 1
-            };
-
-            // Act
-            using (var context = new AppDBContext(_dbContextOptions))
-            {
-                var repo = new RequestsRepository(context);
-                repo.Create(fakeRequest).Wait();
-            }
-
-            // Assert
-            using (var context = new AppDBContext(_dbContextOptions))
-            {
-                var requestFromDB = context.Requests.ToList().Where(x => x.CreatorId == 1).FirstOrDefault();
-                Assert.AreEqual(10, requestFromDB.Id);
-                Assert.AreEqual(fakeRequest.GrossValue, requestFromDB.GrossValue);
-                Assert.AreEqual(fakeRequest.Type, requestFromDB.Type);
-                Assert.AreEqual(fakeRequest.Fee, requestFromDB.Fee);
-                Assert.AreEqual(fakeRequest.NetValue, requestFromDB.NetValue);
-                Assert.AreEqual(fakeRequest.CreatorId, requestFromDB.CreatorId);
-                Assert.AreEqual(Status.Pending, requestFromDB.Status);
-            }
-        }
-
-        [TestMethod]
-        public void GetRequestByCreatorId_ParametersAreCorrect_ResultIsSuccess()
-        {
-            // Arrange
-            var firstFakeRequest = new Request
-            {
-                Type = EnterpriseAPI.Models.Type.Anticipation,
-                Date = DateTime.Now,
-                GrossValue = 100,
-                Fee = 5,
-                NetValue = 95,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now,
-                CreatorId = 3
-            };
-
-            var secondFakeRequest = new Request
-            {
-                Type = EnterpriseAPI.Models.Type.Anticipation,
-                Date = DateTime.Now,
-                GrossValue = 100,
-                Fee = 50,
-                NetValue = 50,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now,
-                CreatorId = 3,
-                Status = Status.Denied
-            };
-
-            using var context = new AppDBContext(_dbContextOptions);
-            var creatorsRepo = new CreatorsRepository(context);
-            creatorsRepo.Add(new Creator() 
-            { 
-                Id = 3,
-                Name = "Mark", 
-                CreatedAt = DateTime.Now, 
-                IsActive = true
-            }).Wait();
-
-            var requestsRepo = new RequestsRepository(context);
-            requestsRepo.Create(firstFakeRequest).Wait();
-            requestsRepo.Create(secondFakeRequest).Wait();
-
-            // Act
-            var requestsFromDB = requestsRepo.GetByCreatorId(3);
-
-            // Assert
-            Assert.AreEqual(2, requestsFromDB.Count());
-        }
-
-        [TestMethod]
-        public void GetRequestByCreatorId_CreatorIdWasNotFound_ResultIsZero()
-        {
-            // Arrange
-            using var context = new AppDBContext(_dbContextOptions);
-            var repo = new RequestsRepository(context);
-
-            // Act
-            var requestsFromDB = repo.GetByCreatorId(99);
-
-            // Assert
-            Assert.AreEqual(0, requestsFromDB.Count());
-        }
-
-        [TestMethod]
         public void CountPendingByCreatorId_CreatorIdWasNotFound_ResultIsZero()
         {
             // Arrange
@@ -241,6 +108,139 @@ namespace Enterprise.MSTests
 
             // Assert
             Assert.AreNotEqual(fakeRequests.Count, requestsFromDB);
+        }
+
+        [TestMethod]
+        public void CreateRequests_ParametersAreCorrect_ResultIsSuccess()
+        {
+            // Arrange
+            var fakeRequest = new Request
+            {
+                Id = 10,
+                Type = EnterpriseAPI.Models.Type.Anticipation,
+                Date = DateTime.Now,
+                GrossValue = 100,
+                Fee = 5,
+                NetValue = 95,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now,
+                CreatorId = 1
+            };
+
+            // Act
+            using (var context = new AppDBContext(_dbContextOptions))
+            {
+                var repo = new RequestsRepository(context);
+                repo.Create(fakeRequest).Wait();
+            }
+
+            // Assert
+            using (var context = new AppDBContext(_dbContextOptions))
+            {
+                var requestFromDB = context.Requests.ToList().Where(x => x.CreatorId == 1).FirstOrDefault();
+                Assert.AreEqual(10, requestFromDB.Id);
+                Assert.AreEqual(fakeRequest.GrossValue, requestFromDB.GrossValue);
+                Assert.AreEqual(fakeRequest.Type, requestFromDB.Type);
+                Assert.AreEqual(fakeRequest.Fee, requestFromDB.Fee);
+                Assert.AreEqual(fakeRequest.NetValue, requestFromDB.NetValue);
+                Assert.AreEqual(fakeRequest.CreatorId, requestFromDB.CreatorId);
+                Assert.AreEqual(Status.Pending, requestFromDB.Status);
+            }
+        }
+
+        [TestMethod]
+        public void DenyRequests_ParametersAreCorrect_ResultIsSuccess()
+        {
+            // Arrange
+            var fakeRequest = new Request
+            {
+                Id = 15,
+                Type = EnterpriseAPI.Models.Type.Anticipation,
+                Date = DateTime.Now,
+                GrossValue = 100,
+                Fee = 5,
+                NetValue = 95,
+                CreatorId = 15
+            };
+
+            // Act and Assert
+            using (var context = new AppDBContext(_dbContextOptions))
+            {
+                var repo = new RequestsRepository(context);
+                repo.Create(fakeRequest).Wait();
+
+                var requestFromDB = repo.GetById(15);
+                Assert.AreEqual(Status.Pending, requestFromDB.Status);
+
+                repo.Deny(fakeRequest).Wait();
+
+                var approvedFakeRequest = repo.GetById(15);
+                Assert.AreEqual(Status.Denied, approvedFakeRequest.Status);
+            }
+        }
+
+        [TestMethod]
+        public void GetRequestByCreatorId_ParametersAreCorrect_ResultIsSuccess()
+        {
+            // Arrange
+            var firstFakeRequest = new Request
+            {
+                Type = EnterpriseAPI.Models.Type.Anticipation,
+                Date = DateTime.Now,
+                GrossValue = 100,
+                Fee = 5,
+                NetValue = 95,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now,
+                CreatorId = 3
+            };
+
+            var secondFakeRequest = new Request
+            {
+                Type = EnterpriseAPI.Models.Type.Anticipation,
+                Date = DateTime.Now,
+                GrossValue = 100,
+                Fee = 50,
+                NetValue = 50,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now,
+                CreatorId = 3,
+                Status = Status.Denied
+            };
+
+            using var context = new AppDBContext(_dbContextOptions);
+            var creatorsRepo = new CreatorsRepository(context);
+            creatorsRepo.Add(new Creator()
+            {
+                Id = 3,
+                Name = "Mark",
+                CreatedAt = DateTime.Now,
+                IsActive = true
+            }).Wait();
+
+            var requestsRepo = new RequestsRepository(context);
+            requestsRepo.Create(firstFakeRequest).Wait();
+            requestsRepo.Create(secondFakeRequest).Wait();
+
+            // Act
+            var requestsFromDB = requestsRepo.GetByCreatorId(3);
+
+            // Assert
+            Assert.AreEqual(2, requestsFromDB.Count());
+        }
+
+        [TestMethod]
+        public void GetRequestByCreatorId_CreatorIdWasNotFound_ResultIsZero()
+        {
+            // Arrange
+            using var context = new AppDBContext(_dbContextOptions);
+            var repo = new RequestsRepository(context);
+
+            // Act
+            var requestsFromDB = repo.GetByCreatorId(99);
+
+            // Assert
+            Assert.AreEqual(0, requestsFromDB.Count());
         }
 
         [TestMethod]

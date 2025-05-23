@@ -7,8 +7,8 @@ namespace EnterpriseAPI.Repositories
     public interface ICreatorsRepository
     {
         Task<bool> Add(Creator Creator);
-        IEnumerable<Creator> Get();
-        Creator GetById(int id);
         Task<bool> Delete(Creator creator);
+        IEnumerable<Creator> Get();
+        Creator GetById(int id);       
     }
 }

@@ -209,6 +209,38 @@ namespace Enterprise.MSTests
         }
 
         [TestMethod]
+        public async Task CreateRequest_ProcessGotAnError_ResultIsFalse()
+        {
+            // Arrange
+            var fakeCreator = new Creator
+            {
+                Id = 15,
+                Name = "Mark",
+                CreatedAt = DateTime.Now,
+                IsActive = true
+            };
+
+            var fakeRequest = new Request
+            {
+                Id = 15,
+                Type = EnterpriseAPI.Models.Type.Anticipation,
+                Date = DateTime.Now,
+                GrossValue = 1000,
+                CreatorId = fakeCreator.Id
+            };
+
+            _mockCreatorsRepository.Setup(r => r.GetById(fakeRequest.CreatorId)).Returns(fakeCreator);
+            _mockRequestsRepository.Setup(r => r.CountPendingByCreatorId(fakeRequest.CreatorId)).Returns(0);
+            _mockRequestsRepository.Setup(r => r.Create(fakeRequest)).ReturnsAsync(false);
+
+            // Act
+            var result = await _mockRequestsBusiness.CreateRequest(fakeRequest);
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
         public async Task CreateRequest_ParametersAreCorrect_ResultIsSuccess()
         {
             // Arrange
@@ -278,6 +310,30 @@ namespace Enterprise.MSTests
         }
 
         [TestMethod]
+        public async Task ApproveRequest_ProcessGotAnError_ResultIsFalse()
+        {
+            // Arrange
+            var fakeRequest = new Request
+            {
+                Id = 15,
+                Type = EnterpriseAPI.Models.Type.Anticipation,
+                Date = DateTime.Now,
+                GrossValue = 100,
+                Fee = 5,
+                NetValue = 95,
+                CreatorId = 15
+            };
+            _mockRequestsRepository.Setup(r => r.GetById(fakeRequest.Id)).Returns(fakeRequest);
+            _mockRequestsRepository.Setup(r => r.Approve(fakeRequest)).ReturnsAsync(false);
+
+            // Act
+            var result = await _mockRequestsBusiness.ApproveRequest(fakeRequest.Id);
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
         public async Task ApproveRequest_ParametersAreCorrect_ResultIsSuccess()
         {
             // Arrange
@@ -330,6 +386,30 @@ namespace Enterprise.MSTests
                 Status = Status.Approved
             };
             _mockRequestsRepository.Setup(r => r.GetById(fakeRequest.Id)).Returns(fakeRequest);
+
+            // Act
+            var result = await _mockRequestsBusiness.DenyRequest(fakeRequest.Id);
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public async Task DenyRequest_ProcessGotAnError_ResultIsFalse()
+        {
+            // Arrange
+            var fakeRequest = new Request
+            {
+                Id = 15,
+                Type = EnterpriseAPI.Models.Type.Anticipation,
+                Date = DateTime.Now,
+                GrossValue = 100,
+                Fee = 5,
+                NetValue = 95,
+                CreatorId = 15
+            };
+            _mockRequestsRepository.Setup(r => r.GetById(fakeRequest.Id)).Returns(fakeRequest);
+            _mockRequestsRepository.Setup(r => r.Deny(fakeRequest)).ReturnsAsync(false);
 
             // Act
             var result = await _mockRequestsBusiness.DenyRequest(fakeRequest.Id);

@@ -6,11 +6,11 @@ namespace EnterpriseAPI.Repositories
 {
     public interface IRequestsRepository
     {
-        Task<bool> Create(Request request);
-        IEnumerable<Request> GetByCreatorId(int creatorId);
-        int CountPendingByCreatorId(int creatorId);
         Task<bool> Approve(Request request);
+        int CountPendingByCreatorId(int creatorId);
+        Task<bool> Create(Request request);
         Task<bool> Deny(Request request);
+        IEnumerable<Request> GetByCreatorId(int creatorId);                   
         Request GetById(int requestId);
     }
 }

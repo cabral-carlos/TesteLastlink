@@ -24,6 +24,19 @@ namespace Enterprise.MSTests
         }
 
         [TestMethod]
+        public async Task AddCreator_ProcessGotAnError_ResultIsFalse()
+        {
+            // Arrange
+            _mockCreatorsRepository.Setup(r => r.Add(It.IsAny<Creator>())).ReturnsAsync(false);
+
+            // Act
+            var result = await _mockCreatorsBusiness.AddCreator("John");
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
         public async Task AddCreator_ParametersAreCorrect_ResultIsSuccess()
         {
             // Arrange
@@ -50,7 +63,7 @@ namespace Enterprise.MSTests
         }
 
         [TestMethod]
-        public async Task DeleteCreator_CreatorWasFound_ResultIsFalse()
+        public async Task DeleteCreator_CreatorWasFound_ResultIsTrue()
         {
             // Arrange
             var fakeCreator = new Creator

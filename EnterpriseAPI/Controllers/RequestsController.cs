@@ -6,6 +6,8 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using EnterpriseAPI.Business;
 using EnterpriseAPI.Models;
+using System.Linq;
+using Microsoft.AspNetCore.Http;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -23,57 +25,7 @@ namespace EnterpriseAPI.Controllers
             _requestsBusiness = requestsBusiness;
         }
 
-        [HttpGet("creator/{creatorId}")]
-        public ActionResult<IEnumerable<Request>> GetAllByCreatorId(int creatorId)
-        {
-            if (creatorId <= 0)
-            {
-                return BadRequest(zeroIdParameterError);
-            }
-
-            var requests = _requestsBusiness.GetRequestsByCreatorId(creatorId);
-
-            if (requests == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(requests);
-        }
-
-        [HttpPost("approve/{id}")]
-        public async Task<ActionResult> Approve(int id)
-        {
-            if (id <= 0)
-            {
-                return BadRequest(zeroIdParameterError);
-            }
-
-            if (await _requestsBusiness.ApproveRequest(id))
-            {
-                return Ok();
-            }
-
-            return BadRequest();
-        }
-
-        [HttpPost("deny/{id}")]
-        public async Task<ActionResult> Deny(int id)
-        {
-            if (id <= 0)
-            {
-                return BadRequest(zeroIdParameterError);
-            }
-
-            if (await _requestsBusiness.DenyRequest(id))
-            {
-                return Ok();
-            }
-
-            return BadRequest();
-        }
-
-        [HttpPost("new")]
+        [HttpPost("add")]
         public async Task<ActionResult> AddRequest([FromBody] RequestParameters parameters)
         {
             if (parameters == null)
@@ -96,10 +48,60 @@ namespace EnterpriseAPI.Controllers
 
             if (await _requestsBusiness.CreateRequest(request))
             {
+                return StatusCode(StatusCodes.Status201Created);
+            }
+
+            return StatusCode(StatusCodes.Status500InternalServerError, "Unexpected error");
+        }
+
+        [HttpPost("approve/{id}")]
+        public async Task<ActionResult> Approve(int id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest(zeroIdParameterError);
+            }
+
+            if (await _requestsBusiness.ApproveRequest(id))
+            {
                 return Ok();
             }
 
-            return BadRequest();
+            return StatusCode(StatusCodes.Status500InternalServerError, "Unexpected error");
+        }
+ 
+        [HttpPost("deny/{id}")]
+        public async Task<ActionResult> Deny(int id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest(zeroIdParameterError);
+            }
+
+            if (await _requestsBusiness.DenyRequest(id))
+            {
+                return Ok();
+            }
+
+            return StatusCode(StatusCodes.Status500InternalServerError, "Unexpected error");
+        }
+
+        [HttpGet("getRequestsByCreatorId/{creatorId}")]
+        public ActionResult GetAllByCreatorId(int creatorId)
+        {
+            if (creatorId <= 0)
+            {
+                return BadRequest(zeroIdParameterError);
+            }
+
+            var requests = _requestsBusiness.GetRequestsByCreatorId(creatorId);
+
+            if (requests == null || !requests.Any())
+            {
+                return NotFound();
+            }
+
+            return Ok(requests);
         }
     }
 
